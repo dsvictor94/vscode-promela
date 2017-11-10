@@ -1,0 +1,45 @@
+{
+    "name": "promela",
+    "displayName": "Promela",
+    "version": "0.1.0",
+    "publisher": "dsvictor94",
+    "engines": {
+        "vscode": "*"
+    },
+    "license": "MIT",
+    "description": "Syntax highlighting for Promela",
+    "categories": [
+        "Languages"
+    ],
+    "preview": true,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dsvictor94/vscode-promela.git"
+    },
+    "bugs": {
+        "url": "https://github.com/dsvictor94/vscode-promela/issues"
+    },
+    "icon": "images/promela-logo.png",
+    "contributes": {
+        "languages": [
+            {
+                "id": "promela",
+                "extensions": [
+                    ".pml",
+                    ".promela"
+                ],
+                "aliases": [
+                    "Promela"
+                ],
+                "configuration": "./promela.configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "promela",
+                "path": "./syntaxes/promela.tmLanguage",
+                "scopeName": "source.promela"
+            }
+        ]
+    }
+}
