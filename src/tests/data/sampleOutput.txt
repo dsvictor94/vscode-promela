@@ -1,0 +1,32 @@
+  0:	proc  - (:root:) creates proc  0 (test)
+  1:	proc  0 (test:1) src/tests/data/test.pml:5 (state 1)	[flag = (1-flag)]
+		flag = 1
+
+  2:	proc  0 (test:1) src/tests/data/test.pml:6 (state 2)	[goto a]
+
+  3:	proc  0 (test:1) src/tests/data/test.pml:5 (state 1)	[flag = (1-flag)]
+		flag = 0
+
+  4:	proc  0 (test:1) src/tests/data/test.pml:6 (state 2)	[goto a]
+
+  5:	proc  0 (test:1) src/tests/data/test.pml:5 (state 1)	[flag = (1-flag)]
+		flag = 1
+
+  6:	proc  0 (test:1) src/tests/data/test.pml:6 (state 2)	[goto a]
+
+  7:	proc  0 (test:1) src/tests/data/test.pml:5 (state 1)	[flag = (1-flag)]
+		flag = 0
+
+  8:	proc  0 (test:1) src/tests/data/test.pml:6 (state 2)	[goto a]
+
+  9:	proc  0 (test:1) src/tests/data/test.pml:5 (state 1)	[flag = (1-flag)]
+		flag = 1
+
+ 10:	proc  0 (test:1) src/tests/data/test.pml:6 (state 2)	[goto a]
+
+-------------
+depth-limit (-u10 steps) reached
+#processes: 1
+		flag = 1
+ 10:	proc  0 (test:1) src/tests/data/test.pml:5 (state 1)
+1 processes created

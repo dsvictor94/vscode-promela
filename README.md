@@ -2,6 +2,14 @@
 
 This Visual Studio Code extension provides syntax highlighting for the Promela language. Files ending with `.pml` or `.promela` will be automatically handled.
 
+## Using The Debug
+
+* Switch to the debug viewlet and press the gear dropdown.
+* Select the debug environment "Promela Debug".
+* Press the green 'play' button to start debugging.
+
+And then, you can now step through a ramdom spin simulation to promela files.
+
 ## License
 
 MIT

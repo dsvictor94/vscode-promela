@@ -1,45 +1,154 @@
 {
-    "name": "promela",
-    "displayName": "Promela",
-    "version": "0.1.0",
-    "publisher": "dsvictor94",
-    "engines": {
-        "vscode": "*"
-    },
-    "license": "MIT",
-    "description": "Syntax highlighting for Promela",
-    "categories": [
-        "Languages"
-    ],
-    "preview": true,
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/dsvictor94/vscode-promela.git"
-    },
-    "bugs": {
-        "url": "https://github.com/dsvictor94/vscode-promela/issues"
-    },
-    "icon": "images/promela-logo.png",
-    "contributes": {
-        "languages": [
-            {
-                "id": "promela",
-                "extensions": [
-                    ".pml",
-                    ".promela"
-                ],
-                "aliases": [
-                    "Promela"
-                ],
-                "configuration": "./promela.configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "promela",
-                "path": "./syntaxes/promela.tmLanguage",
-                "scopeName": "source.promela"
-            }
-        ]
-    }
+	"name": "promela",
+	"displayName": "Promela",
+	"version": "0.2.0",
+	"publisher": "dsvictor94",
+	"engines": {
+		"vscode": "^1.17.0",
+		"node": "^7.9.0"
+	},
+	"license": "MIT",
+	"description": "Syntax highlighting for Promela and Spin Simulation on debugger",
+	"categories": [
+		"Languages",
+		"Debuggers"
+	],
+	"preview": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dsvictor94/vscode-promela.git"
+	},
+	"bugs": {
+		"url": "https://github.com/dsvictor94/vscode-promela/issues"
+	},
+	"icon": "images/promela-logo.png",
+	"dependencies": {
+		"buffer-split": "^1.0.0",
+		"vscode-debugadapter": "^1.24.0",
+		"vscode-debugprotocol": "^1.24.0"
+	},
+	"devDependencies": {
+		"@types/node": "^6.0.50",
+		"@types/mocha": "^2.2.44",
+		"typescript": "^2.5.3",
+		"mocha": "^3.5.0",
+		"vscode": "^1.1.6",
+		"vscode-debugadapter-testsupport": "^1.24.0",
+		"tslint": "^5.8.0",
+		"vsce": "^1.31.2"
+	},
+	"scripts": {
+		"prepublish": "tsc -p ./src",
+		"compile": "tsc -p ./src",
+		"tslint": "tslint ./src/**/*.ts",
+		"watch": "tsc -w -p ./src",
+		"test": "mocha -u tdd ./out/tests/",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"package": "vsce package",
+		"publish": "vsce publish"
+	},
+	"main": "./out/extension",
+	"activationEvents": [
+		"onDebug"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "promela",
+				"extensions": [
+					".pml",
+					".promela"
+				],
+				"aliases": [
+					"Promela"
+				],
+				"configuration": "./promela.configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "promela",
+				"path": "./syntaxes/promela.tmLanguage",
+				"scopeName": "source.promela"
+			}
+		],
+		"breakpoints": [
+			{
+				"language": "promela"
+			}
+		],
+		"debuggers": [
+			{
+				"type": "promela-debug",
+				"label": "Promela Debug",
+				"program": "./out/mockDebug.js",
+				"runtime": "node",
+				"configurationAttributes": {
+					"launch": {
+						"required": [
+							"program"
+						],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "Absolute path to a promela model.",
+								"default": "${workspaceFolder}/${file}"
+							},
+							"stopOnEntry": {
+								"type": "boolean",
+								"description": "Automatically stop after launch.",
+								"default": true
+							},
+							"trace": {
+								"type": "boolean",
+								"description": "Enable logging of the Debug Adapter Protocol.",
+								"default": false
+							},
+							"spin": {
+								"type": "string",
+								"description": "Absolute path to spin.",
+								"default": "spin"
+							},
+							"stepLimit": {
+								"type": "number",
+								"decription": "Maximun number step a simulation can run until stop",
+								"default": 500
+							},
+							"seed": {
+								"type": "number",
+								"decription": "Seed for random nr generator",
+								"default": 123
+							},
+							"verbose": {
+								"type": "boolean",
+								"description": "Show spin output on debug output.",
+								"default": false
+							}
+						}
+					}
+				},
+				"initialConfigurations": [
+					{
+						"type": "promela-debug",
+						"request": "launch",
+						"name": "Simulate Model",
+						"program": "${workspaceFolder}/${file}",
+						"stopOnEntry": true
+					}
+				],
+				"configurationSnippets": [
+					{
+						"label": "Promela Debug: Simulate",
+						"description": "A new configuration for launching a spin simulation",
+						"body": {
+							"type": "promela-debug",
+							"request": "launch",
+							"name": "${2:Simulate Model}",
+							"program": "^\"\\${workspaceFolder}/${1:model.pml}\""
+						}
+					}
+				]
+			}
+		]
+	}
 }

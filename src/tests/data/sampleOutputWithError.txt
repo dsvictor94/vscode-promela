@@ -1,0 +1,38 @@
+  0:	proc  - (:root:) creates proc  0 (user)
+  0:	proc  - (:root:) creates proc  1 (user)
+spin: tests/data/test.pml:0, warning, proctype user, 'byte  cc' variable is never used (other than in print stmnts)
+  1:	proc  0 (user:1) tests/data/test.pml:10 (state 1)	[assert(((_pid==0)||(_pid==1)))]
+
+  2:	proc  1 (user:1) tests/data/test.pml:10 (state 1)	[assert(((_pid==0)||(_pid==1)))]
+
+  3:	proc  0 (user:1) tests/data/test.pml:12 (state 2)	[flag[_pid] = 1]
+		flag[0] = 1
+		flag[1] = 0
+
+  4:	proc  0 (user:1) tests/data/test.pml:13 (state 3)	[turn = _pid]
+
+  5:	proc  1 (user:1) tests/data/test.pml:12 (state 2)	[flag[_pid] = 1]
+		flag[0] = 1
+		flag[1] = 1
+
+  6:	proc  1 (user:1) tests/data/test.pml:13 (state 3)	[turn = _pid]
+		turn = 1
+
+  7:	proc  0 (user:1) tests/data/test.pml:14 (state 4)	[(((flag[(1-_pid)]==0)||(turn==(1-_pid))))]
+
+  8:	proc  0 (user:1) tests/data/test.pml:16 (state 5)	[ncrit = (ncrit+1)]
+		ncrit = 1
+
+  9:	proc  0 (user:1) tests/data/test.pml:17 (state 6)	[cc = (cc+1)]
+		user(0):cc = 1
+
+spin: tests/data/test.pml:18, Error: assertion violated
+spin: text of failed assertion: assert((ncrit==0))
+#processes: 2
+		turn = 1
+		flag[0] = 1
+		flag[1] = 1
+		ncrit = 1
+ 10:	proc  1 (user:1) tests/data/test.pml:14 (state 4)
+ 10:	proc  0 (user:1) tests/data/test.pml:18 (state 7)
+2 processes created
