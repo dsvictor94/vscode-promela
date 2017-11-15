@@ -1,7 +1,7 @@
 {
 	"name": "promela",
 	"displayName": "Promela",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"publisher": "dsvictor94",
 	"engines": {
 		"vscode": "^1.17.0",

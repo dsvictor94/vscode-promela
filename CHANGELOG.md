@@ -1,5 +1,9 @@
 # Change log
 
+## v0.2.2
+
+Small fix
+
 ## v0.2.1
 
 Add Suport to queues (chan) on debug

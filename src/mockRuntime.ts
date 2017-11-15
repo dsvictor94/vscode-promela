@@ -231,8 +231,6 @@ export class MockRuntime extends EventEmitter {
 						this._variableHandles.create('queue')
 					];
 
-					this.sendEvent('output', [local, global, queues], step.program, step.line, 0);
-
 					this._references.set(sp,[local, global, queues])
 
 					const globalVars = new Map(this._variables.get(this._references.get(sp-1)![1])!);
