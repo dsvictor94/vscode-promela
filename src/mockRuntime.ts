@@ -86,15 +86,17 @@ export class MockRuntime extends EventEmitter {
 		spinOutput.pipe(this._spinParser);
 
 
-		const [local, global] = [
+		const [local, global, queues] = [
 			this._variableHandles.create('local'),
-			this._variableHandles.create('global')
+			this._variableHandles.create('global'),
+			this._variableHandles.create('queues')
 		];
 
-		this._references.set(-1, [local, global]);
+		this._references.set(-1, [local, global, queues]);
 
 		this._variables.set(local, new Map<string, Variable>());
 		this._variables.set(global, new Map<string, Variable>());
+		this._variables.set(queues, new Map<string, Variable>());
 
 		if (stopOnEntry) {
 			// we step once
@@ -223,15 +225,21 @@ export class MockRuntime extends EventEmitter {
 					this._threads.set(step.proc, new Thread(step.proc, `${step.procName}(${step.proc})`))
 				}
 				if (!this._references.has(sp)) {
-					const [local, global] =  [
+					const [local, global, queues] =  [
 						this._variableHandles.create('local'),
-						this._variableHandles.create('global')
+						this._variableHandles.create('global'),
+						this._variableHandles.create('queue')
 					];
 
-					this._references.set(sp,[local, global])
+					this.sendEvent('output', [local, global, queues], step.program, step.line, 0);
+
+					this._references.set(sp,[local, global, queues])
 
 					const globalVars = new Map(this._variables.get(this._references.get(sp-1)![1])!);
 					this._variables.set(global, globalVars);
+
+					const queuesVars = new Map(this._variables.get(this._references.get(sp-1)![2])!);
+					this._variables.set(queues, queuesVars);
 
 					let lastSp = sp;
 					while(--lastSp !== -1 && this._steps[lastSp].proc !== step.proc);
@@ -246,6 +254,10 @@ export class MockRuntime extends EventEmitter {
 
 						for (const name of Object.keys(step.updates.global)) {
 							globalVars.set(name, new Variable(name, step.updates.global[name].toString()))
+						}
+
+						for (const name of Object.keys(step.updates.queues)) {
+							queuesVars.set(name, new Variable(name, step.updates.queues[name].toString()))
 						}
 					}
 				}
@@ -288,7 +300,7 @@ export class MockRuntime extends EventEmitter {
 			this.sendEvent('output', step.rawOutput, step.program, step.line, 0);
 
 		if (step.error) {
-			this.sendEvent('stopOnException', -1, 'oiii');
+			this.sendEvent('stopOnException', -1);
 			return true;
 		}
 
@@ -299,7 +311,7 @@ export class MockRuntime extends EventEmitter {
 			if (bps.length > 0) {
 
 				// send 'stopped' event
-				this.sendEvent('stopOnBreakpoint', step.proc || -1);
+				this.sendEvent('stopOnBreakpoint', step.proc !== undefined ? step.proc : -1);
 
 				// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
 				// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event

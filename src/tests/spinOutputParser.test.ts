@@ -26,8 +26,9 @@ suite('Spin Output Parser', () => {
 						line: 5,
 						state: 1,
 						updates: {
+							queues: {},
 							global: {
-								flag: 1
+								flag: "1"
 							},
 							local: {}
 						},
@@ -48,6 +49,24 @@ suite('Spin Output Parser', () => {
 					.on('data', (step: SpinStep) => { count++; })
 					.once('end', () => {
 						assert.equal(count, 10);
+						resolve();
+					})
+			})
+		});
+	});
+
+	suite('queue', () => {
+		const SAMPLE_OUTPUT = Path.join(DATA_ROOT, 'sampleOutputWithQueue.txt');
+
+		test('should parse all steps', () => {
+			const spinOutput = fs.createReadStream(SAMPLE_OUTPUT);
+			const spinParser = new SpinOutputParser();
+			return new Promise((resolve, reject) => {
+				let count = 0;
+				spinOutput.pipe(spinParser)
+					.on('data', (step: SpinStep) => { count++; })
+					.once('end', () => {
+						assert.equal(count, 15);
 						resolve();
 					})
 			})

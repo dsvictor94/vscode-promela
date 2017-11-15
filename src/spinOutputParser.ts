@@ -30,8 +30,9 @@ export interface SpinStep {
 	state: number;
 	/** A map of variables updated at this step */
 	updates: {
-		global: { [key: string]: number | string; }
-		local: { [key: string]: number | string; }
+		queues: { [key: number]: string[]; }
+		global: { [key: string]: string | string[]; }
+		local: { [key: string]: string | string[]; }
 	},
 	/** raw output related with this step */
 	rawOutput: string,
@@ -44,6 +45,9 @@ export default class SpinOutputParser extends Transform {
 	private _currentStep = <SpinStep | SpinStepError | null> null;
 
 	private static LINE_REGEX = /([0-9]+):\s+proc\s+([0-9]+)\s+\((.*):([0-9]+)\)\s+(.*):([0-9]+)\s+\(state\s+([0-9]+)\)/;
+	private static QUEUE_REGEX = /queue\s+([0-9]+)\s+\((.*)\):\s+((\[.*?\])*)/;
+	private static ASSIG_REGEX = /\s*(.*)\s+=\s+(.*)/;
+	private static LOCAL_REGEX = /\s*.*\([0-9]+\):(.*)/;
 
 	constructor() {
 		super();
@@ -70,21 +74,34 @@ export default class SpinOutputParser extends Transform {
 					break;
 				} else { // parse a data line
 					this._currentStep.rawOutput += line;
+					const updates = (<SpinStep>this._currentStep).updates;
 
-					if (line.split(':').length > 1) {
-						const [name, strValue] = line.split(':')[1].split(' = ');
-						const updates = (<SpinStep>this._currentStep).updates;
-						const numValue = parseInt(strValue.trim());
+					const queueMatch = line.match(SpinOutputParser.QUEUE_REGEX);
+					if(queueMatch !== null ) {
+						const [,queue, variable, data] = queueMatch;
 
-						const value = Number.isNaN(numValue) ? strValue.trim() : numValue;
-						updates.local[name.trim()] = value;
-					} else {
-						const [name, strValue] = line.split(' = ');
-						const updates = (<SpinStep>this._currentStep).updates;
-						const numValue = parseInt(strValue.trim());
+						const values = data.split(']').filter(x => x).map(s => s.slice(1));
 
-						const value = Number.isNaN(numValue) ? strValue.trim() : numValue;
-						updates.global[name.trim()] = value;
+						updates.queues[parseInt(queue, 10)] = values;
+
+						if (variable.match(SpinOutputParser.LOCAL_REGEX)) {
+							const key = variable.split(':')[1].trim();
+							updates.local[key] = values;
+						} else {
+							updates.global[variable.trim()] = values;
+						}
+					}
+
+					const assigMatch = line.match(SpinOutputParser.ASSIG_REGEX);
+					if (assigMatch !== null) {
+						const [,variable, value] = assigMatch;
+
+						if (variable.match(SpinOutputParser.LOCAL_REGEX)) {
+							const key = variable.split(':')[1].trim();
+							updates.local[key] = value;
+						} else {
+							updates.global[variable.trim()] = value;
+						}
 					}
 				}
 			} else if(line.trim() === '-------------') {
@@ -114,7 +131,7 @@ export default class SpinOutputParser extends Transform {
 					program,
 					line: parseInt(programLine, 10),
 					state: parseInt(state),
-					updates: { local: {}, global: {} },
+					updates: { queues: {}, local: {}, global: {} },
 					rawOutput: line,
 					error: false
 				}

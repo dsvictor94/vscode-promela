@@ -187,9 +187,10 @@ class MockDebugSession extends LoggingDebugSession {
 
 		const scopes = new Array<Scope>();
 
-		const [local, global] = this._runtime.scopes(args.frameId);
+		const [local, global, queues] = this._runtime.scopes(args.frameId);
 
 		scopes.push(new Scope("Global", global, false));
+		scopes.push(new Scope("Queues", queues, false));
 		scopes.push(new Scope("Local", local, false));
 
 		response.body = {

@@ -1,0 +1,61 @@
+  0:	proc  - (:root:) creates proc  0 (Clients)
+  0:	proc  - (:root:) creates proc  1 (Clients)
+  0:	proc  - (:root:) creates proc  2 (Server)
+spin: /home/victor/victor/formalismo/model.pml:0, warning, proctype Clients, 'int   b' variable is never used (other than in print stmnts)
+  1:	proc  2 (Server:1) /home/victor/victor/formalismo/model.pml:19 (state 1)	[(1)]
+
+  2:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:9 (state 1)	[assert(((_pid==0)|(_pid==1)))]
+
+  2:	proc  2 (Server:1) terminates
+  3:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:9 (state 1)	[assert(((_pid==0)|(_pid==1)))]
+
+  4:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:11 (state 2)	[a = 0]
+		Clients(0):a = 0
+
+  5:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:12 (state 3)	[b = 0]
+		Clients(0):b = 0
+
+  6:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:11 (state 2)	[a = 0]
+		Clients(1):a = 0
+
+  7:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:12 (state -)	[values: 1!WRITE]
+  7:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:12 (state 4)	[fromServer[_pid]!WRITE]
+		queue 1 (fromServer[0]): [WRITE]
+		queue 2 (fromServer[1]): 
+
+  8:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:13 (state -)	[values: 1!WRITE]
+  8:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:13 (state 5)	[fromServer[_pid]!WRITE]
+		queue 1 (fromServer[0]): [WRITE][WRITE]
+
+  9:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:12 (state 3)	[b = 0]
+		Clients(1):b = 0
+
+ 10:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:14 (state -)	[values: 1!WRITE]
+ 10:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:14 (state 6)	[fromServer[_pid]!WRITE]
+		queue 1 (fromServer[0]): [WRITE][WRITE][WRITE]
+
+ 11:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:15 (state -)	[values: 1?WRITE]
+ 11:	proc  0 (Clients:1) /home/victor/victor/formalismo/model.pml:15 (state 7)	[fromServer[_pid]?a]
+		queue 1 (fromServer[0]): [WRITE][WRITE]
+		Clients(0):a = WRITE
+
+ 12:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:12 (state -)	[values: 2!WRITE]
+ 12:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:12 (state 4)	[fromServer[_pid]!WRITE]
+		queue 2 (fromServer[1]): [WRITE]
+
+ 13:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:13 (state -)	[values: 2!WRITE]
+ 13:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:13 (state 5)	[fromServer[_pid]!WRITE]
+		queue 2 (fromServer[1]): [WRITE][WRITE]
+
+ 14:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:14 (state -)	[values: 2!WRITE]
+ 14:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:14 (state 6)	[fromServer[_pid]!WRITE]
+		queue 2 (fromServer[1]): [WRITE][WRITE][WRITE]
+
+ 15:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:15 (state -)	[values: 2?WRITE]
+ 15:	proc  1 (Clients:1) /home/victor/victor/formalismo/model.pml:15 (state 7)	[fromServer[_pid]?a]
+		queue 2 (fromServer[1]): [WRITE][WRITE]
+		Clients(1):a = WRITE
+
+ 15:	proc  1 (Clients:1) terminates
+ 15:	proc  0 (Clients:1) terminates
+3 processes created
