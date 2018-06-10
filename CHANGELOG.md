@@ -1,5 +1,10 @@
 # Change log
 
+## v0.3.0
+
+highlight 'of' modifier
+highlight 'for'
+
 ## v0.2.2
 
 Small fix
