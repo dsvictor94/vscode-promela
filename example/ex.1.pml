@@ -1,4 +1,4 @@
-mtype = { Wakeme, Running }		// file ex_5.pml
+mtype = { Wakeme, Running }
 
 bit	lk, sleep_q
 bit	r_lock, r_want
