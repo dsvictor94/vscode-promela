@@ -159,7 +159,7 @@
 			<key>comment</key>
 			<string>modifiers</string>
 			<key>match</key>
-			<string>\b(hidden|init|inline|active|local|show)\b</string>
+			<string>\b(hidden|init|inline|active|local|show|of)\b</string>
 			<key>name</key>
 			<string>storage.modifier</string>
 		</dict>
