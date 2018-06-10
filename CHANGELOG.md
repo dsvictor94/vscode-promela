@@ -1,9 +1,13 @@
 # Change log
 
+## v0.3.1
+
+Test with spin Version 6.4.8 (2 March 2018)
+
 ## v0.3.0
 
-highlight 'of' modifier
-highlight 'for'
+Highlight 'of' modifier
+Highlight 'for'
 
 ## v0.2.2
 
