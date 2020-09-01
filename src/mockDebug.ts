@@ -12,6 +12,7 @@ import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
 import { MockRuntime, MockBreakpoint } from './mockRuntime';
 import { spawn, ChildProcess } from 'child_process';
+import * as os from "os";
 
 
 /**
@@ -120,7 +121,7 @@ class MockDebugSession extends LoggingDebugSession {
 
 		const spinArgs = ['-p', '-s', '-r', '-X', '-v', `-n${args.seed || 123}`, '-l', '-g', `-u${args.stepLimit || 500}`, args.program]
 		const spin = args.spin || 'spin';
-		this._spinProcess = spawn(spin, spinArgs)
+		this._spinProcess = spawn(spin, spinArgs, {cwd: os.tmpdir()})
 
 		this.sendEvent(new OutputEvent(`${spin} ${spinArgs.join(' ')}\n`, 'info'));
 
