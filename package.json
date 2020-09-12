@@ -49,6 +49,7 @@
 	},
 	"main": "./out/extension",
 	"activationEvents": [
+		"onLanguage:promela",
 		"onDebug"
 	],
 	"contributes": {
