@@ -28,13 +28,15 @@ export class PromelaSyntaxChecker {
       return;
     }
 
-    const spinPath = config.get("spin", "spin")
+    const spinPath = config.get("spin", "spin");
 
     const fileName = document.fileName;
     const uri = document.uri;
 
     fs.mkdtemp(path.join(os.tmpdir(), 'promela-vscode-'), (err, tmpdir) => {
-      if (err) return;
+      if (err) {
+        return;
+      }
 
       const spinProcess = cp.spawn(
         spinPath,
@@ -45,13 +47,13 @@ export class PromelaSyntaxChecker {
       );
 
       const spinOut: Buffer[] = [];
-      spinProcess.stdout.on('data', (data: Buffer) => {spinOut.push(data)});
+      spinProcess.stdout.on('data', (data: Buffer) => { spinOut.push(data); });
 
       const spinErr: Buffer[] = [];
-      spinProcess.stderr.on('data', (data: Buffer) => {spinErr.push(data)});
+      spinProcess.stderr.on('data', (data: Buffer) => { spinErr.push(data); });
 
       spinProcess.on('exit', (code, signal) => {
-        rimraf(tmpdir, (err) => { if(err) console.error(err); });
+        rimraf(tmpdir, (err) => { if (err) { console.error(err); } });
 
         // extract the problems from output
         const diagnostics: vscode.Diagnostic[] = [];
@@ -72,7 +74,7 @@ export class PromelaSyntaxChecker {
           }
         }
 
-        const outLines = Buffer.concat(spinOut).toString('utf8').split('\n')
+        const outLines = Buffer.concat(spinOut).toString('utf8').split('\n');
         for (const line of outLines) {
           const found = line.match(/spin: (.+):(\d+), Error: ([^:]*)/);
           if (found) {
@@ -82,7 +84,7 @@ export class PromelaSyntaxChecker {
 
             let message = error;
             if (error.startsWith("syntax error")) {
-              message = "syntax error"
+              message = "syntax error";
             }
 
             const diagnostic = new vscode.Diagnostic(
@@ -96,16 +98,19 @@ export class PromelaSyntaxChecker {
 
         this.diag.set(uri, diagnostics);
 
-        if (onComplete !== undefined)
+        if (onComplete !== undefined) {
           onComplete();
+        }
       });
 
       spinProcess.on('error', (error) => {
         vscode.window.showWarningMessage(`${spinPath} is not executable`, 'Configure spin path').then((item) => {
-          if(!item) return
+          if (!item) {
+            return;
+          }
 
           vscode.commands.executeCommand('workbench.action.openSettings', 'promela.spin');
-        })
+        });
       });
     });
   }

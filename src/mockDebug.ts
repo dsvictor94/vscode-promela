@@ -68,9 +68,9 @@ class MockDebugSession extends LoggingDebugSession {
 		this._runtime.on('stopOnBreakpoint', (threadId) => {
 			this.sendEvent(new StoppedEvent('breakpoint', threadId));
 		});
-		this._runtime.on('stopOnException', (threadId, exception_text) => {
+		this._runtime.on('stopOnException', (threadId, exceptionText) => {
 			const ev = new StoppedEvent('exception', threadId);
-			ev.body.reason = 'exception_text';
+			ev.body.reason = exceptionText;
 			this.sendEvent(ev);
 		});
 		this._runtime.on('breakpointValidated', (bp: MockBreakpoint) => {
@@ -116,24 +116,24 @@ class MockDebugSession extends LoggingDebugSession {
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
 
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
-		logger.setup(args.trace? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
+		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
-		const spinArgs = ['-p', '-s', '-r', '-X', '-v', `-n${args.seed || 123}`, '-l', '-g', `-u${args.stepLimit || 500}`, args.program]
+		const spinArgs = ['-p', '-s', '-r', '-X', '-v', `-n${args.seed || 123}`, '-l', '-g', `-u${args.stepLimit || 500}`, args.program];
 		const spin = args.spin;
-		this._spinProcess = spawn(spin, spinArgs)
+		this._spinProcess = spawn(spin, spinArgs);
 
 		this.sendEvent(new OutputEvent(`${spin} ${spinArgs.join(' ')}\n`, 'info'));
 
 		this._spinProcess.on('exit', (code, signal) => {
 			this.sendEvent(new OutputEvent(`${spin} exit with ${code || signal}\n`, 'info'));
-		})
+		});
 
 		this._spinProcess.on('error', (err) => {
 			this.sendEvent(new OutputEvent(`${spin} fail with ${err}`, 'error'));
-		})
+		});
 
 		// start the program in the runtime
-		this._runtime.start(this._spinProcess.stdout, !!args.stopOnEntry, args.verbose !== false);
+		this._runtime.start(this._spinProcess.stdout!, !!args.stopOnEntry, args.verbose !== false);
 
 		this.sendResponse(response);
 	}
@@ -149,8 +149,8 @@ class MockDebugSession extends LoggingDebugSession {
 		// set and verify breakpoint locations
 		const actualBreakpoints = clientLines.map(l => {
 			let { verified, line, id } = this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l));
-			const bp = <DebugProtocol.Breakpoint> new Breakpoint(verified, this.convertDebuggerLineToClient(line));
-			bp.id= id;
+			const bp = <DebugProtocol.Breakpoint>new Breakpoint(verified, this.convertDebuggerLineToClient(line));
+			bp.id = id;
 			return bp;
 		});
 
@@ -221,10 +221,10 @@ class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
-	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments) : void {
+	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments): void {
 		this._runtime.continue(true);
 		this.sendResponse(response);
- 	}
+	}
 
 	protected stepInRequest(response: DebugProtocol.StepInResponse, args: DebugProtocol.NextArguments): void {
 		this._runtime.step();

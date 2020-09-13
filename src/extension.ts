@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   ws.onDidCloseTextDocument((e: vscode.TextDocument) => {
-    diag.delete(e.uri)
+    diag.delete(e.uri);
   });
 }
 
@@ -79,7 +79,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
         });
     }
 
-    if(!config.spin) {
+    if (!config.spin) {
       config.spin = vscode.workspace.getConfiguration('promela').get('spin', 'spin');
     }
 
