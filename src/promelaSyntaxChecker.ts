@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 import * as os from "os";
+import * as path from "path";
+import * as fs from "fs";
 import * as cp from "child_process";
+import * as rimraf from 'rimraf';
 
 function isFileUri(uri: vscode.Uri): boolean {
   return uri.scheme === "file";
@@ -14,73 +17,96 @@ export class PromelaSyntaxChecker {
   }
 
   public execute(document: vscode.TextDocument, onComplete?: () => void): void {
+    const config = vscode.workspace.getConfiguration("promela");
+
     if (
       document.languageId !== "promela" ||
       document.isUntitled ||
-      !isFileUri(document.uri)
+      !isFileUri(document.uri) ||
+      config.get("spin") === null
     ) {
       return;
     }
 
+    const spinPath = config.get("spin", "spin")
+
     const fileName = document.fileName;
     const uri = document.uri;
 
-    let onDidExec = (error: Error, stdout: string, stderr: string) => {
-      if (this.hasError(error, stderr)) {
-        return;
-      }
+    fs.mkdtemp(path.join(os.tmpdir(), 'promela-vscode-'), (err, tmpdir) => {
+      if (err) return;
 
-      // Cleanup Old Problems
-      this.diag.delete(uri);
-      const lines = stdout.split("\n");
-      let diagnostics: vscode.Diagnostic[] = [];
-      for (const line of lines) {
-        const found = line.match(/spin: (.+):(\d+), Error: syntax error	(.*)/);
-        if (found) {
-          const linum = parseInt(found[2]);
-          const message = found[3];
-          const range = new vscode.Range(linum - 1, 0, linum - 1, 0);
-          const diagnostic = new vscode.Diagnostic(
-            range,
-            message,
-            vscode.DiagnosticSeverity.Error
-          );
-          diagnostics.push(diagnostic);
+      const spinProcess = cp.spawn(
+        spinPath,
+        ["-a", fileName],
+        {
+          cwd: tmpdir,
         }
-      }
+      );
 
-      this.diag.set(uri, diagnostics);
-    };
+      const spinOut: Buffer[] = [];
+      spinProcess.stdout.on('data', (data: Buffer) => {spinOut.push(data)});
 
-    cp.exec(
-      "spin -a " + fileName,
-      {
-        cwd: os.tmpdir(),
-      },
-      onDidExec
-    );
-  }
+      const spinErr: Buffer[] = [];
+      spinProcess.stderr.on('data', (data: Buffer) => {spinErr.push(data)});
 
-  public clear(document: vscode.TextDocument): void {
-    let uri = document.uri;
-    if (isFileUri(uri)) {
-      this.diag.delete(uri);
-    }
-  }
+      spinProcess.on('exit', (code, signal) => {
+        rimraf(tmpdir, (err) => { if(err) console.error(err); });
 
-  private hasError(error: Error, stderr: string): boolean {
-    let errorOutput = stderr.toString();
-    if (error && (<any>error).code === "ENOENT") {
-      vscode.window.showWarningMessage(`SPIN is not executable`);
-      return true;
-    } else if (error && (<any>error).code === 127) {
-      vscode.window.showWarningMessage(stderr);
-      return true;
-    } else if (errorOutput.length > 0) {
-      vscode.window.showWarningMessage(stderr);
-      return true;
-    }
+        // extract the problems from output
+        const diagnostics: vscode.Diagnostic[] = [];
 
-    return false;
+        const errLines = Buffer.concat(spinErr).toString('utf8').split('\n');
+        for (const line of errLines) {
+          const found = line.match(/(.+):(\d+): error: (.*)/);
+          if (found) {
+            const linum = parseInt(found[2]);
+            const message = found[3].trim();
+            const range = new vscode.Range(linum - 1, 0, linum - 1, 0);
+            const diagnostic = new vscode.Diagnostic(
+              range,
+              message,
+              vscode.DiagnosticSeverity.Error
+            );
+            diagnostics.push(diagnostic);
+          }
+        }
+
+        const outLines = Buffer.concat(spinOut).toString('utf8').split('\n')
+        for (const line of outLines) {
+          const found = line.match(/spin: (.+):(\d+), Error: ([^:]*)/);
+          if (found) {
+            const linum = parseInt(found[2]);
+            const error = found[3].trim();
+            const range = new vscode.Range(linum - 1, 0, linum - 1, Number.MAX_VALUE);
+
+            let message = error;
+            if (error.startsWith("syntax error")) {
+              message = "syntax error"
+            }
+
+            const diagnostic = new vscode.Diagnostic(
+              range,
+              message,
+              vscode.DiagnosticSeverity.Error
+            );
+            diagnostics.push(diagnostic);
+          }
+        }
+
+        this.diag.set(uri, diagnostics);
+
+        if (onComplete !== undefined)
+          onComplete();
+      });
+
+      spinProcess.on('error', (error) => {
+        vscode.window.showWarningMessage(`${spinPath} is not executable`, 'Configure spin path').then((item) => {
+          if(!item) return
+
+          vscode.commands.executeCommand('workbench.action.openSettings', 'promela.spin');
+        })
+      });
+    });
   }
 }
