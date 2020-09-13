@@ -114,12 +114,12 @@
 							},
 							"stepLimit": {
 								"type": "number",
-								"decription": "Maximun number step a simulation can run until stop",
+								"decription": "Maximun number step a simulation can run until stop.",
 								"default": 500
 							},
 							"seed": {
 								"type": "number",
-								"decription": "Seed for random nr generator",
+								"decription": "Seed for random nr generator.",
 								"default": 123
 							},
 							"verbose": {
@@ -135,7 +135,7 @@
 						"type": "promela-debug",
 						"request": "launch",
 						"name": "Simulate Model",
-						"program": "${workspaceFolder}/${file}",
+						"program": "${file}",
 						"stopOnEntry": true
 					}
 				],

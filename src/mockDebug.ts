@@ -28,7 +28,7 @@ interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	/** enable logging the Debug Adapter Protocol */
 	trace?: boolean;
 
-	spin?: string;
+	spin: string;
 
 	seed?: number;
 
@@ -119,14 +119,21 @@ class MockDebugSession extends LoggingDebugSession {
 		logger.setup(args.trace? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
 		const spinArgs = ['-p', '-s', '-r', '-X', '-v', `-n${args.seed || 123}`, '-l', '-g', `-u${args.stepLimit || 500}`, args.program]
-		const spin = args.spin || 'spin';
+		const spin = args.spin;
 		this._spinProcess = spawn(spin, spinArgs)
 
 		this.sendEvent(new OutputEvent(`${spin} ${spinArgs.join(' ')}\n`, 'info'));
 
+		this._spinProcess.on('exit', (code, signal) => {
+			this.sendEvent(new OutputEvent(`${spin} exit with ${code || signal}\n`, 'info'));
+		})
+
+		this._spinProcess.on('error', (err) => {
+			this.sendEvent(new OutputEvent(`${spin} fail with ${err}`, 'error'));
+		})
 
 		// start the program in the runtime
-		this._runtime.start(this._spinProcess.stdout, !!args.stopOnEntry, !!args.verbose);
+		this._runtime.start(this._spinProcess.stdout, !!args.stopOnEntry, args.verbose !== false);
 
 		this.sendResponse(response);
 	}
