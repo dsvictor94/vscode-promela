@@ -65,7 +65,7 @@
 				"aliases": [
 					"Promela"
 				],
-				"configuration": "./promela.configuration.json"
+				"configuration": "./language-configuration.json"
 			}
 		],
 		"grammars": [
