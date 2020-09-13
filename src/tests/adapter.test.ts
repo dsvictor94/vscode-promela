@@ -5,7 +5,7 @@
 
 import assert = require('assert');
 import * as Path from 'path';
-import {DebugClient} from 'vscode-debugadapter-testsupport';
+import { DebugClient } from 'vscode-debugadapter-testsupport';
 
 suite('Node Debug Adapter', () => {
 
@@ -17,12 +17,12 @@ suite('Node Debug Adapter', () => {
 
 	let dc: DebugClient;
 
-	setup( () => {
+	setup(() => {
 		dc = new DebugClient('node', DEBUG_ADAPTER, 'mock');
 		return dc.start();
 	});
 
-	teardown( () => dc.stop() );
+	teardown(() => dc.stop());
 
 
 	suite('basic', () => {
@@ -81,7 +81,7 @@ suite('Node Debug Adapter', () => {
 			return Promise.all([
 				dc.configurationSequence(),
 				dc.launch({ program: PROGRAM, stopOnEntry: true, stepLimit: 30 }),
-				dc.assertStoppedLocation('entry', { line: ENTRY_LINE } )
+				dc.assertStoppedLocation('entry', { line: ENTRY_LINE })
 			]);
 		});
 	});
@@ -93,7 +93,7 @@ suite('Node Debug Adapter', () => {
 			const PROGRAM = Path.join(DATA_ROOT, 'test.pml');
 			const BREAKPOINT_LINE = 13;
 
-			return dc.hitBreakpoint({ program: PROGRAM, stepLimit: 30 }, { path: PROGRAM, line: BREAKPOINT_LINE } );
+			return dc.hitBreakpoint({ program: PROGRAM, stepLimit: 30 }, { path: PROGRAM, line: BREAKPOINT_LINE });
 		});
 	});
 });

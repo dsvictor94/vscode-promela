@@ -46,4 +46,4 @@ active proctype server() {		// interrupt routine
         :: else ->
       fi
       goto wakeup
-  }
+}

@@ -24,7 +24,7 @@ interface RunParameter {
  */
 export class MockRuntime extends EventEmitter {
 
-	private _threads = new Map<number, Thread>([[-1, new Thread(-1, "Main")]])
+	private _threads = new Map<number, Thread>([[-1, new Thread(-1, "Main")]]);
 	public get threads() {
 		return this._threads;
 	}
@@ -67,21 +67,21 @@ export class MockRuntime extends EventEmitter {
 			this._steps.push(step);
 
 			if (this._unfinishedRun) {
-				const {reverse, stepEvent} = this._unfinishedRun;
+				const { reverse, stepEvent } = this._unfinishedRun;
 				this._unfinishedRun = null;
 				this.run(reverse, stepEvent);
 			}
 
-		})
+		});
 
 		this._spinParser.on('end', () => {
 			this._end = true;
 			if (this._unfinishedRun) {
-				const {reverse, stepEvent} = this._unfinishedRun;
+				const { reverse, stepEvent } = this._unfinishedRun;
 				this._unfinishedRun = null;
 				this.run(reverse, stepEvent);
 			}
-		})
+		});
 
 		spinOutput.pipe(this._spinParser);
 
@@ -130,14 +130,14 @@ export class MockRuntime extends EventEmitter {
 
 		let st = this._currentStep;
 		let level = 0;
-		while(st >= 0 && level < endFrame) {
+		while (st >= 0 && level < endFrame) {
 			const step = this._steps[st--];
 			if (step.error || step.proc === threadId || threadId === -1) {
 				level++;
-				if(level >= startFrame) {
+				if (level >= startFrame) {
 					frames.push({
-						index: st+1,
-						name: `state ${step.error? 'error' : step.state}`,
+						index: st + 1,
+						name: `state ${step.error ? 'error' : step.state}`,
 						file: step.program,
 						line: step.line
 					});
@@ -162,9 +162,9 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Set breakpoint in file with given line.
 	 */
-	public setBreakPoint(path: string, line: number) : MockBreakpoint {
+	public setBreakPoint(path: string, line: number): MockBreakpoint {
 
-		const bp = <MockBreakpoint> { verified: false, line, id: this._breakpointId++ };
+		const bp = <MockBreakpoint>{ verified: false, line, id: this._breakpointId++ };
 		let bps = this._breakPoints.get(path);
 		if (!bps) {
 			bps = new Array<MockBreakpoint>();
@@ -180,7 +180,7 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Clear breakpoint in file with given line.
 	 */
-	public clearBreakPoint(path: string, line: number) : MockBreakpoint | undefined {
+	public clearBreakPoint(path: string, line: number): MockBreakpoint | undefined {
 		let bps = this._breakPoints.get(path);
 		if (bps) {
 			const index = bps.findIndex(bp => bp.line === line);
@@ -208,7 +208,7 @@ export class MockRuntime extends EventEmitter {
 	 */
 	private run(reverse = false, stepEvent?: string) {
 		if (reverse) {
-			for (let sp = this._currentStep-1; sp >= 0; sp--) {
+			for (let sp = this._currentStep - 1; sp >= 0; sp--) {
 				const step = this._steps[sp];
 				if (this.fireEventsForStep(step, stepEvent)) {
 					this._currentStep = sp;
@@ -219,43 +219,43 @@ export class MockRuntime extends EventEmitter {
 			this._currentStep = 0;
 			this.sendEvent('stopOnEntry');
 		} else {
-			for (let sp = this._currentStep+1; sp < this._steps.length; sp++) {
+			for (let sp = this._currentStep + 1; sp < this._steps.length; sp++) {
 				const step = this._steps[sp];
 				if (!step.error && !this._threads.has(step.proc)) {
-					this._threads.set(step.proc, new Thread(step.proc, `${step.procName}(${step.proc})`))
+					this._threads.set(step.proc, new Thread(step.proc, `${step.procName}(${step.proc})`));
 				}
 				if (!this._references.has(sp)) {
-					const [local, global, queues] =  [
+					const [local, global, queues] = [
 						this._variableHandles.create('local'),
 						this._variableHandles.create('global'),
 						this._variableHandles.create('queue')
 					];
 
-					this._references.set(sp,[local, global, queues])
+					this._references.set(sp, [local, global, queues]);
 
-					const globalVars = new Map(this._variables.get(this._references.get(sp-1)![1])!);
+					const globalVars = new Map(this._variables.get(this._references.get(sp - 1)![1])!);
 					this._variables.set(global, globalVars);
 
-					const queuesVars = new Map(this._variables.get(this._references.get(sp-1)![2])!);
+					const queuesVars = new Map(this._variables.get(this._references.get(sp - 1)![2])!);
 					this._variables.set(queues, queuesVars);
 
 					let lastSp = sp;
-					while(--lastSp !== -1 && this._steps[lastSp].proc !== step.proc);
+					while (--lastSp !== -1 && this._steps[lastSp].proc !== step.proc) { ; }
 
 					const localVars = new Map(this._variables.get(this._references.get(lastSp)![0])!);
 					this._variables.set(local, localVars);
 
-					if(!step.error) {
+					if (!step.error) {
 						for (const name of Object.keys(step.updates.local)) {
-							localVars.set(name, new Variable(name, step.updates.local[name].toString()))
+							localVars.set(name, new Variable(name, step.updates.local[name].toString()));
 						}
 
 						for (const name of Object.keys(step.updates.global)) {
-							globalVars.set(name, new Variable(name, step.updates.global[name].toString()))
+							globalVars.set(name, new Variable(name, step.updates.global[name].toString()));
 						}
 
 						for (const name of Object.keys(step.updates.queues)) {
-							queuesVars.set(name, new Variable(name, step.updates.queues[name].toString()))
+							queuesVars.set(name, new Variable(name, step.updates.queues[name].toString()));
 						}
 					}
 				}
@@ -272,11 +272,11 @@ export class MockRuntime extends EventEmitter {
 				return;
 			}
 
-			this._unfinishedRun = <RunParameter>{reverse, stepEvent};
+			this._unfinishedRun = <RunParameter>{ reverse, stepEvent };
 		}
 	}
 
-	private verifyBreakpoints(path: string) : void {
+	private verifyBreakpoints(path: string): void {
 		let bps = this._breakPoints.get(path);
 		if (bps) {
 			bps.forEach(bp => {
@@ -294,8 +294,7 @@ export class MockRuntime extends EventEmitter {
 	 */
 	private fireEventsForStep(step: SpinStep, stepEvent?: string): boolean {
 
-		if(this._verbose || step.error)
-			this.sendEvent('output', step.rawOutput, step.program, step.line, 0);
+		if (this._verbose || step.error) { this.sendEvent('output', step.rawOutput, step.program, step.line, 0); }
 
 		if (step.error) {
 			this.sendEvent('stopOnException', -1);
@@ -331,7 +330,7 @@ export class MockRuntime extends EventEmitter {
 		return false;
 	}
 
-	private sendEvent(event: string, ... args: any[]) {
+	private sendEvent(event: string, ...args: any[]) {
 		setImmediate(_ => {
 			this.emit(event, ...args);
 		});

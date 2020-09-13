@@ -16,28 +16,28 @@ suite('Spin Output Parser', () => {
 			const spinParser = new SpinOutputParser();
 			return new Promise((resolve, reject) => {
 				spinOutput.pipe(spinParser)
-				.once('data', (step: SpinStep) => {
-					assert.deepEqual(step, <SpinStep>{
-						step: 1,
-						proc: 0,
-						procID: 1,
-						procName: 'test',
-						program: 'src/tests/data/test.pml',
-						line: 5,
-						state: 1,
-						updates: {
-							queues: {},
-							global: {
-								flag: "1"
+					.once('data', (step: SpinStep) => {
+						assert.deepEqual(step, <SpinStep>{
+							step: 1,
+							proc: 0,
+							procID: 1,
+							procName: 'test',
+							program: 'src/tests/data/test.pml',
+							line: 5,
+							state: 1,
+							updates: {
+								queues: {},
+								global: {
+									flag: "1"
+								},
+								local: {}
 							},
-							local: {}
-						},
-						rawOutput: '  1:\tproc  0 (test:1) src/tests/data/test.pml:5 (state 1)\t[flag = (1-flag)]\n\t\tflag = 1\n',
-						error: false
-					})
-					resolve(true);
-				})
-			})
+							rawOutput: '  1:\tproc  0 (test:1) src/tests/data/test.pml:5 (state 1)\t[flag = (1-flag)]\n\t\tflag = 1\n',
+							error: false
+						});
+						resolve(true);
+					});
+			});
 		});
 
 		test('should parse all steps', () => {
@@ -50,8 +50,8 @@ suite('Spin Output Parser', () => {
 					.once('end', () => {
 						assert.equal(count, 10);
 						resolve();
-					})
-			})
+					});
+			});
 		});
 	});
 
@@ -68,8 +68,8 @@ suite('Spin Output Parser', () => {
 					.once('end', () => {
 						assert.equal(count, 15);
 						resolve();
-					})
-			})
+					});
+			});
 		});
 	});
 
@@ -82,7 +82,7 @@ suite('Spin Output Parser', () => {
 			return new Promise((resolve, reject) => {
 				let last: SpinStepError | SpinStep;
 				spinOutput.pipe(spinParser)
-					.on('data', (step: SpinStep | SpinStepError) => { last = step })
+					.on('data', (step: SpinStep | SpinStepError) => { last = step; })
 					.once('end', () => {
 						assert.deepEqual(last, <SpinStepError>{
 							program: 'tests/data/test.pml',
@@ -91,8 +91,8 @@ suite('Spin Output Parser', () => {
 							error: true
 						});
 						resolve();
-					})
-			})
+					});
+			});
 		});
 	});
 });
