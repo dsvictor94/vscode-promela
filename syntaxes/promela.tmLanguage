@@ -40,6 +40,11 @@
 		<dict>
 			<key>captures</key>
 			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator</string>
+				</dict>
 				<key>2</key>
 				<dict>
 					<key>name</key>
@@ -54,7 +59,28 @@
 			<key>comment</key>
 			<string>defines</string>
 			<key>match</key>
-			<string>^(#)\s*(define)\s*([a-zA-Z_]+[0-9a-zA-Z_]*)</string>
+			<string>^\s*(#)\s*(define|undef)\s*([a-zA-Z_]+[0-9a-zA-Z_]*)</string>
+		</dict>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>other macros</string>
+			<key>match</key>
+			<string>^\s*(#)\s*(ifn?def\s*|if\s*|else|endif|include|error)</string>
+			<key>name</key>
+			<string>macros.other</string>
 		</dict>
 		<dict>
 			<key>comment</key>
